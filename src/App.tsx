@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import './App.css'
-import { useModalAlert } from './useModal';
+import { useModal} from './useModal';
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [Modal, call] = useModalAlert()
-  // const [leftCharColor, setLeftCharColor] = useState("#f00");
-  // const [rightCharColor, setRightCharColor] = useState("#0f0");
-  const [started, setStarted] = useState(false)
+  const Modal1 = useModal()
+  const [Modal1IsOpen, setModal1IsOpen] = useState(false);
+  const Modal2 = useModal()
+  const [Modal2IsOpen, setModal2IsOpen] = useState(false);
+  const [leftCharColor, setLeftCharColor] = useState("#f00");
+  const [rightCharColor, setRightCharColor] = useState("#0f0");
+
+  
 
   function drawLine(ctx: CanvasRenderingContext2D, from: {x: number, y: number}, to: {x: number, y: number}, color?: string) {
     if (!!color) ctx.strokeStyle = color;
@@ -61,26 +65,6 @@ function App() {
       hits: 0,
       color: "#f00"
     }]
-    let player1: Player = {
-      position: {x: 20, y: 30},
-      name: "Player1",
-      speed: 5,
-      shootCooldown: 3,
-      shootTime: 0,
-      bulletSpeed: 5,
-      hits: 0,
-      color: "#0f0"
-    };
-    let player2: Player = {
-      position: {x: canvasSize.width - 20, y: canvasSize.height - 31},
-      name: "Player2",
-      speed: -5,
-      shootCooldown: 3,
-      shootTime: 0,
-      bulletSpeed: -5,
-      hits: 0,
-      color: "#f00"
-    };
     const mousePos = {x: 0, y: 0}
     const bullets = new Map<number, Bullet>()
     
@@ -92,7 +76,6 @@ function App() {
           (mousePos.x >= player.position.x - (radius + racketWidth / 2) && mousePos.x <= player.position.x + (radius + racketWidth / 2))  
       ) player.speed *= -1;
       player.position.y += player.speed;
-      return player;
       bullets.forEach((bullet, key, map) => {
         if (bullet.speed !== player.bulletSpeed) {
           if ((bullet.position.x >= player.position.x - radius && bullet.position.x <= player.position.x + radius) &&
@@ -114,7 +97,7 @@ function App() {
         used: false,
         color: "#fff",
       };
-      bullets.set(new Date().getTime(), bullet)
+      bullets.set(new Date().getTime() + player.bulletSpeed, bullet)
       console.log(bullets)
     }
 
@@ -146,7 +129,7 @@ function App() {
       ctx.clearRect(0,0,canvasSize.width, canvasSize.height)
       
       players.map((player) => {
-        DrawCircle(player.position, radius, player.color)
+        DrawCircle(player.position, radius, player.name === "Player1" ? window.localStorage.getItem("color1") ?? "#f00" : window.localStorage.getItem("color2") ?? "#0f0")
         player.shootTime += deltaTime
         if (player.shootTime >= player.shootCooldown) {
           Shoot(player);
@@ -188,12 +171,14 @@ function App() {
     inputs.forEach((input: Element) => {
       (input as HTMLInputElement).addEventListener("change", (e) => {
         const [player, field] = input.id.split(":");
-        if (player === "player1") 
+        if (player === "player1") {
           //@ts-ignore
-        player1[field] = +e.target.value;
-        if (player === "player2") 
+          players[0][field] = +e.target.value;
+        }
+        if (player === "player2") {
           //@ts-ignore
-        player2[field] = +e.target.value;
+          players[1][field] = +e.target.value;
+        }
       })
     })
     window.requestAnimationFrame(Update);
@@ -202,15 +187,14 @@ function App() {
   function ConfigureAndStart(canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    if (!window.localStorage.getItem("color1")) window.localStorage.setItem("color1", "#f00")
+    if (!window.localStorage.getItem("color2")) window.localStorage.setItem("color2", "#0f0")
     Start(ctx, canvas)
   }
 
-
   useEffect(() => {
-    if (!!canvasRef.current && !started) {
+    if (!!canvasRef.current) {
       ConfigureAndStart(canvasRef.current)
-      setStarted(true);
-      console.log("!")
     }
   }, [canvasRef.current])
 
@@ -219,31 +203,50 @@ function App() {
       <div>
         <div className='range-end'>
           <label>Bullet Cooldown</label>
-          <input step={0.1} min = {1} max = {5} value = {3} type='range' id="player1:shootCooldown"/>
+          <input step={0.1} min = {1} max = {5} defaultValue = {3} type='range' id="player1:shootCooldown"/>
         </div>
         <div className='range-end'>
           <label>Speed</label>
           <input step={0.1} min = {1} max = {10}  type='range' id="player1:speed"/>
         </div>
+        <div>
+          <button onClick={() => {
+            setModal2IsOpen(true)
+          }}>Change color</button>
+        </div>
       </div>
       <canvas ref={canvasRef} width = {750} height={500}/>
       <div style = {{justifyContent: 'flex-start'}}>
         <div className='range-start' >
-          <input step={0.1} min = {1} max = {5} value = {3} type='range' id="player2:shootCooldown"/>
+          <input step={0.1} min = {1} max = {5} defaultValue = {3} type='range' id="player2:shootCooldown"/>
           <label>Bullet Cooldown</label>
         </div>
         <div className='range-start'>
           <input step={0.1} min = {1} max = {10}  type='range' id="player2:speed"/>
           <label>Speed</label>
         </div>
+        <div>
+          <button onClick={() => {
+            setModal1IsOpen(true)
+          }}>Change color</button>
+        </div>
+        <Modal1 open = {Modal1IsOpen} setOpen={setModal1IsOpen}>
+          <input type = "color" value = {window.localStorage.getItem("color2") ?? "#f00"} onChange={(e) => {window.localStorage.setItem("color2", e.target.value)}}/>
+        </Modal1>
+        <Modal2 open = {Modal2IsOpen} setOpen={setModal2IsOpen}>
+          <input type = "color" value = {window.localStorage.getItem("color1") ?? "#0f0"} onChange={(e) => {window.localStorage.setItem("color1", e.target.value)}}/>
+        </Modal2>
       </div>
-      <div>
-        <button onClick = {() => {
-          call("hai")
-        }}/>
-      </div>
-      <Modal/>
     </div>
+  )
+}
+
+function ModalW({color, setColor}: {color: string; setColor: any}) {
+  return (
+    <>
+      <h2>{color}</h2>
+      <input type="color" value = {color} onChange={(e) => {setColor(e.target.value)}}/>
+    </>
   )
 }
 

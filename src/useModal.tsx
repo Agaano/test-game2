@@ -1,35 +1,26 @@
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
-export function useModalAlert(): [
-	() => React.ReactNode,
-	(elem: React.ReactNode | string) => void
-] {
-	const [windows, setWindows] = useState<React.ReactNode[]>([])
-	const ref = useRef<HTMLDivElement | null>(null)
+export function useModal() {
+    const ref = useRef<HTMLDivElement | null>(null)
+    
+    return ({children, open, setOpen}: {children: React.ReactNode, open: boolean, setOpen: (value: boolean) => void}) => {
+        if (!open) {
+            return;
+        } 
 
-	const call = (elemToPaste: React.ReactNode | string) => {
-		setWindows(prev => [...prev, elemToPaste])
-	}
+        return (
+            <div className="modal" onClick = {(e:any) => {
+                    if (!ref.current?.contains(e.target)) {
+                        setOpen(false)
+                    }
+                }}>
+                <div ref = {ref} className="modal-content">
+                    {children}
+                </div>
+            </div>
+        )
+    }
 
-	const windowsElement = () => {
-		return (
-			<>{windows.length > 0 &&
-					windows.map((window, index) => {
-						return (
-						<main className='modal' onClick = {(e:any) => {
-							if (!ref.current?.contains(e.target)) {
-							setWindows(prev => removeByIndex(prev,index))
-						}}}>
-							<div ref = {ref} className='modal-content'>
-								{window}
-							</div>
-						</main>
-					)})
-				}</>
-		)
-	}
-
-	return [windowsElement, call]
 }
 
 function removeByIndex(array: Array<any>, index: number) {
