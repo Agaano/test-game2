@@ -63,7 +63,7 @@ export default (props: {gameData: GameData, setGameData: React.Dispatch<React.Se
         if (gonnaHitWall || (gonnaHitRacketX && gonnaHitRacketY)) 
             player.speed *= -1;
 
-        gameData.bullets.forEach((bullet, key, map) => {
+        gameData.bullets.forEach((bullet, key) => {
             if (bullet.speed !== player.bulletSpeed) {
               if ((bullet.x >= player.x - gameData.playerRadius && bullet.x <= player.x + gameData.playerRadius) &&
                   (bullet.y >= player.y - gameData.playerRadius && bullet.y <= player.y + gameData.playerRadius) && !bullet.hit
