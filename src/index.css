@@ -13,6 +13,25 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  display: flex;
+  column-gap: 10px;
+  justify-content: center;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+}
+
+.leftPlayer {
+  align-items: flex-end;
+}
+
+.rightPlayer {
+  align-items: flex-start;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -28,6 +47,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  width: 100%;
 }
 
 h1 {
@@ -52,46 +72,4 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-
-.range-start {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.range-end {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.modal {
-  background-color: #1a1a1a99;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  inset: 0;
-}
-
-.modal-content {
-  padding: 15px;
-  border-radius: 15px;
-  background-color: #111111;
-  width: 100%;
-  max-width: 300px;
-  height: fit-content;
 }
