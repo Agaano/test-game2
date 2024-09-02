@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useModal} from './useModal';
 
@@ -8,9 +8,6 @@ function App() {
   const [Modal1IsOpen, setModal1IsOpen] = useState(false);
   const Modal2 = useModal()
   const [Modal2IsOpen, setModal2IsOpen] = useState(false);
-  const [leftCharColor, setLeftCharColor] = useState("#f00");
-  const [rightCharColor, setRightCharColor] = useState("#0f0");
-
   
 
   function drawLine(ctx: CanvasRenderingContext2D, from: {x: number, y: number}, to: {x: number, y: number}, color?: string) {
@@ -238,15 +235,6 @@ function App() {
         </Modal2>
       </div>
     </div>
-  )
-}
-
-function ModalW({color, setColor}: {color: string; setColor: any}) {
-  return (
-    <>
-      <h2>{color}</h2>
-      <input type="color" value = {color} onChange={(e) => {setColor(e.target.value)}}/>
-    </>
   )
 }
 

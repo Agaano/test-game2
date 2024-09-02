@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useRef } from "react"
 
 export function useModal() {
     const ref = useRef<HTMLDivElement | null>(null)
@@ -21,20 +21,4 @@ export function useModal() {
         )
     }
 
-}
-
-function removeByIndex(array: Array<any>, index: number) {
-	if (index < 0 || index >= array.length) {
-		return array
-	}
-
-	const newArray = new Array(array.length - 1)
-	for (let i = 0; i < index; i++) {
-		newArray[i] = array[i]
-	}
-	for (let i = index + 1; i < array.length; i++) {
-		newArray[i - 1] = array[i]
-	}
-
-	return newArray
 }
